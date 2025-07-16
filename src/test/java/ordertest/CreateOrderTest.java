@@ -1,7 +1,8 @@
-package orderTest;
+package ordertest;
 
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
+import io.restassured.response.ValidatableResponse;
 import models.Order;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,14 +17,13 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static constants.ConstantOrder.*;
+import static org.apache.http.HttpStatus.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 
-public class CreateOrderTest {
-    private StepsOrder stepsOrder = new StepsOrder();
+public class CreateOrderTest extends BaseOrderTest {
 
-    @BeforeEach
-    public void before() {
-        RestAssured.baseURI = "https://qa-scooter.praktikum-services.ru";
-    }
+
     static Stream<List<String>> paramsColor() {
         return Stream.of(
                 Collections.singletonList("BLACK"),
@@ -38,11 +38,16 @@ public class CreateOrderTest {
     @MethodSource("paramsColor")
     @DisplayName("Создание заказа")
     void createOrderTest(List<String> color) {
-       Order order = new Order(FIRST_NAME,LAST_NAME,ADDRESS,METRO_STATION,PHONE,RENTTIME,DELIVERY_DATE,COMMENT,color);
-        Number track = stepsOrder.createOrder(order).then().statusCode(201).extract().path("track");
-        System.out.println("track:"+track);
-        stepsOrder.searchOrder(track).then().statusCode(200);
-      stepsOrder.cancelOrder(track).then().statusCode(200);
+        Order order = new Order(FIRST_NAME, LAST_NAME, ADDRESS, METRO_STATION, PHONE, RENTTIME, DELIVERY_DATE, COMMENT, color);
+        Response response = stepsOrder.createOrder(order);
+        response.then()
+                .statusCode(SC_CREATED)
+                .body("track", notNullValue());
+
+        int track = response.then().extract().path("track");
+        stepsOrder.searchOrder(track).then().statusCode(SC_OK).body("order", notNullValue());
+        this.trackId = track;
+
 
     }
 

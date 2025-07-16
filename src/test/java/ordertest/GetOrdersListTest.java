@@ -1,30 +1,24 @@
-package orderTest;
+package ordertest;
 
-import io.qameta.allure.Step;
 import io.restassured.RestAssured;
-import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import steps.StepsCourier;
 import steps.StepsOrder;
 
 import static io.restassured.RestAssured.given;
+import static org.apache.http.HttpStatus.SC_OK;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.notNullValue;
 
-public class GetOrdersListTest {
-    private StepsOrder stepsOrder = new StepsOrder();
-    @BeforeEach
-    public void before() {
-        RestAssured.baseURI = "https://qa-scooter.praktikum-services.ru";
+public class GetOrdersListTest extends BaseOrderTest {
 
-    }
+
 
 @Test
     public void getOrdersListTest() {
     stepsOrder.getOrdersList()
             .then()
-            .statusCode(200)
+            .statusCode(SC_OK)
             .body("orders",notNullValue())
             .body("orders.size()",greaterThan(0));
 
