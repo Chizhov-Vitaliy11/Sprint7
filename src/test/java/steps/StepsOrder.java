@@ -2,16 +2,18 @@ package steps;
 
 import io.qameta.allure.Step;
 import io.restassured.response.Response;
+
 import io.restassured.response.ValidatableResponse;
 import models.Order;
 
+import static api.OrderApi.*;
 import static io.restassured.RestAssured.given;
 
 public class StepsOrder {
     @Step("Получить список заказов")
     public Response getOrdersList() {
         return given()
-                .get("/api/v1/orders");
+                .get(API_GET_ORDERS);
 
     }
 
@@ -22,7 +24,7 @@ public class StepsOrder {
                 .header("Content-Type", "application/json")
                 .body(order)
                 .when()
-                .post("/api/v1/orders");
+                .post(API_CREATE_ORDER);
     }
 
 
@@ -31,15 +33,15 @@ public class StepsOrder {
         return given()
                // .header("Content-Type", "application/json")
                 //.body("{\"track\": "+trackId+"}")
-                .put("/api/v1/orders/cancel?track="+trackId);
+                .put(API_CANCEL_ORDER+trackId);
 
     }
 
     @Step("Поиск заказа")
-    public Response searchOrder(Number trackId) {
+    public Response searchOrder(int trackId) {
         return given()
-                .when()
-                .get("/api/v1/orders/track?t="+ trackId);
+              .when()
+                .get(API_SEARCH_ORDER+ trackId);
     }
 
 }
